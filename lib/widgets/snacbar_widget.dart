@@ -15,8 +15,12 @@ void mostrarSnacbar({
     mensaje = 'Tarea Eliminada';
     _colorStatus = Colors.red;
   }
+  if (status==200 && typeModel=='task' && typeConsult =='update') {
+    mensaje = 'Tarea Actualizada';
+    _colorStatus = Colors.blue;
+  }
 
-  final snackBar = SnackBar(
+  var snackBar = SnackBar(
     elevation: 10,
     behavior: SnackBarBehavior.floating,
     backgroundColor: _colorStatus,
@@ -26,7 +30,11 @@ void mostrarSnacbar({
     ),
     duration: Duration(milliseconds: 3000),
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    if (status == 0) {
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
 
     // scaffoldkey.currentState.showSnackBar(snackbar);
   }

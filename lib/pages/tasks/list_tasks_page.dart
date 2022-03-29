@@ -16,23 +16,24 @@ class ListTaskPage extends StatefulWidget {
 
 class ListTaskPageState extends State<ListTaskPage> {
 
-  final tasksProvider = new TasksService();
+  // final tasksProvider = new TasksService();
   Colores _colores = Colores();
   bool loading = false;
   TasksService tasksService = TasksService();
 
 
 
+
  @override
  void initState() {
-   tasksService.cargarTasks;
+
     super.initState();
+    // tasksService.cargarTasks(context);
   }
 
   @override
   Widget build(BuildContext context) {
-
-  // final heroesInfo = Provider.of<SnacBarProvider>(context);
+    actualizarListado();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -45,10 +46,18 @@ class ListTaskPageState extends State<ListTaskPage> {
       body: _crearListado()
     );
   }
+  Future<void> actualizarListado () async {
+    final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: true);
+      setState(() {
+      if (snacbarProvider.selectedStatusCode == 0) {
+      _crearListado();
+      }
+    });
+  }
 
   Widget _crearListado(){
     return FutureBuilder(
-      future: tasksProvider.cargarTasks(),
+      future: tasksService.cargarTasks(context),
       builder: (BuildContext context, AsyncSnapshot<List<TaskModelGet>> snapshot){
         if (snapshot.hasData) {
           final tasks = snapshot.data;
@@ -76,7 +85,7 @@ class ListTaskPageState extends State<ListTaskPage> {
           color:  Colors.white,
         ),
         onDismissed: (direccion) async {
-         snacbarProvider.selectedStatusCode = await tasksProvider.deleteTask(task.id);
+         snacbarProvider.selectedStatusCode = await tasksService.deleteTask(task.id);
 
         //  print(snacbarProvider.selectedStatusCode);
          mostrarSnacbar(
@@ -85,15 +94,23 @@ class ListTaskPageState extends State<ListTaskPage> {
             typeModel: 'task',
             typeConsult: 'delete'
          );
-
+        snacbarProvider.selectedStatusCode = 0;
         },
         child: Column(
           children: [
             GestureDetector(
               onTap: (){
-                 Navigator.pushNamed(context, 'task',arguments: task).then((value) {setState(() {
-                   build(context);
-                 });});
+                Navigator.pushNamed(context, 'task',arguments: task).then((value) {setState(() {
+                  mostrarSnacbar(
+                    status:  snacbarProvider.selectedStatusCode,
+                    context: context,
+                    typeModel: 'task',
+                    typeConsult: 'update'
+                  );
+
+                });});
+                  actualizarListado();
+              snacbarProvider.selectedStatusCode = 0;
               },
               child: Container(
                 margin: EdgeInsets.all(15),
@@ -134,7 +151,7 @@ class ListTaskPageState extends State<ListTaskPage> {
           value: taskModelGet.status,
           activeColor: _colores.teal,
           onChanged:  (value)  async{
-            await tasksProvider.editarEstadoTask(taskModelGet.id);
+            await tasksService.editarEstadoTask(taskModelGet.id);
             setState(() {
               taskModelGet.status = value;
             });

@@ -7,6 +7,7 @@ import 'package:task_aplicattion2/providers/snacbar_provider.dart';
 import '../../estilos/Colores_estilos.dart';
 import '../../models/tareas/task_modelGet.dart';
 import '../../models/tareas/task_modelPost.dart';
+import '../../providers/ui_provider.dart';
 import '../../services/tasks_service.dart';
 import '../../widgets/snacbar_widget.dart';
 import '../../widgets/textFormField_task_widget.dart';
@@ -218,25 +219,15 @@ class _TaskPageState extends State<TaskPage> {
 
     if (taskModelGet != null) {
       // print(taskModelGetToJson(taskModelGet));
-      tasksService.editartask(taskModelGet);
+      snacbarProvider.selectedStatusCode = await tasksService.editartask(taskModelGet);
 
     } else {
       //Registrar
       snacbarProvider.selectedStatusCode = await tasksService.crearTask(taskModelPost);
     }
+
+
     Navigator.pop(context);
   }
 
-  // void mostrarSnacbar(String mensaje) {
-  //   final snackbar = SnackBar(
-  //     backgroundColor: Colors.green,
-  //     content: Text(
-  //       mensaje,
-  //       style: TextStyle(fontWeight: FontWeight.bold),
-  //     ),
-  //     duration: Duration(milliseconds: 3000),
-  //   );
-  //   // ignore: deprecated_member_use
-  //   scaffoldkey.currentState.showSnackBar(snackbar);
-  // }
 }

@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:hotreloader/hotreloader.dart';
 import 'package:pandabar/main.view.dart';
 import 'package:pandabar/model.dart';
 import 'package:provider/provider.dart';
@@ -70,8 +71,8 @@ class _ButtomNavigationBarState extends State<ButtomNavigationBar> {
         backgroundColor: _colores.black,
         onFabButtonPressed: () {
           if (uiProvider.selectedMenuOpt ==1) {
-            Navigator.pushNamed(context, 'task').then((value) {
-              value.hashCode;
+            Navigator.pushNamed(context, 'task').then((value) async {
+
               setState(() {
                 mostrarSnacbar(
                   status:  snacbarProvider.selectedStatusCode,
@@ -80,6 +81,9 @@ class _ButtomNavigationBarState extends State<ButtomNavigationBar> {
                   typeConsult: 'post'
                 );
               });
+              snacbarProvider.selectedStatusCode = 0;
+
+
             });
           }
           if(uiProvider.selectedMenuOpt ==0){
