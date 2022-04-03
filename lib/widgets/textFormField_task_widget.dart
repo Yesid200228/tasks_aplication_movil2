@@ -5,14 +5,14 @@ import 'package:task_aplicattion2/models/tareas/task_modelPost.dart';
 
 Widget formField(
 {
-    TaskModelGet taskModelGet,
-    TaskModelPost taskModelPost,
-    String labelText,
-    String hintext,
-    String validatorTrue,
-    String validatorFalse,
-    Icon icon,
-    String type,
+  TaskModelGet taskModelGet,
+  TaskModelPost taskModelPost,
+  String labelText,
+  String hintext,
+  String validatorTrue,
+  String validatorFalse,
+  Icon icon,
+  String type,
 }
 
   ) {
@@ -25,11 +25,11 @@ Widget formField(
       decoration: InputDecoration(
         labelText: labelText,
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: colores.grey),
+          borderSide: BorderSide(color: colores.terciary),
         ),
         icon: icon,
         hintText: hintext,
-        labelStyle: TextStyle(color: colores.grey),
+        labelStyle: TextStyle(color: colores.terciary),
       ),
       onSaved: (value) =>
            taskModelGet == null

@@ -23,7 +23,7 @@ class TaskProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  
+
   set selectedListTask( List<TaskModelGet> listTaskModelGet ){
 
     listTasks = listTaskModelGet;

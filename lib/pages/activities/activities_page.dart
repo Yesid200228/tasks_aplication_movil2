@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dropdown_x/flutter_dropdown_x.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:task_aplicattion2/estilos/Colores_estilos.dart';
-import 'package:task_aplicattion2/models/activity/activity_modelGet.dart';
+import 'package:task_aplicattion2/providers/snacbar_provider.dart';
 import 'package:task_aplicattion2/providers/task_provider.dart';
+import 'package:task_aplicattion2/services/activity_service.dart';
+import 'package:task_aplicattion2/widgets/activities/butonGuardar_widget.dart';
+import 'package:task_aplicattion2/widgets/snacbar_widget.dart';
 
-import '../../widgets/list_tasks_status.dart';
+import '../../models/activity/activity_modelPost.dart';
+
 
 class ActivitiesPage extends StatefulWidget {
 
@@ -18,11 +23,15 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   final formKey = GlobalKey<FormState>();
   final scaffoldkey = GlobalKey<ScaffoldState>();
 
+  ActivityModelPost activityModelPost =  ActivityModelPost();
+  ActivitiesService activitiesService = ActivitiesService();
 
-  ActivityModelGet activityModelGet =  ActivityModelGet();
   Colores _colores = Colores();
   DateTime dateTime;
   DateTime dateTime2;
+
+  String _selected = "";
+
 
   @override
   void initState() {
@@ -34,6 +43,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
     final taskProvider = Provider.of<TaskProvider>(context,listen: false);
 
+    // actualizarCard();
 
     setState(() {
       taskProvider.selectedTask;
@@ -41,8 +51,8 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
     return Scaffold(
        key: scaffoldkey,
       appBar: AppBar(
-        backgroundColor: _colores.teal,
-        title: Text('Crear Actividades',style: TextStyle(color:_colores.space ),),
+        backgroundColor: _colores.secondary,
+        title: Text('Crear Actividades',style: TextStyle(color:_colores.primary ),),
         actions: [
         ],
         centerTitle: true,
@@ -57,38 +67,63 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
                 SizedBox(height: 30),
                 title('Escoger fechas'),
                 SizedBox(height: 30),
-                title('Fecha de Inicio'),
-                buttonFecha(context,dateTime,'inicio'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                  Column(children: [
+                      // title('Fecha Inicio'),
+                      SizedBox(height: 20),
+                      buttonFecha(context,dateTime,'inicio'),
+                    ]),
+                  Column(children: [
+                    // title('Fecha final'),
+                      SizedBox(height: 20),
+                    buttonFecha(context,dateTime2,'final'),
+                  ]),
+                ],
+                ),
+
+                // buttonTareas(context),
                 SizedBox(height: 30),
-                title('Fecha final'),
-                buttonFecha(context,dateTime2,'final'),
-                SizedBox(height: 30),
-                buttonTareas(context),
-                SizedBox(height: 30),
-                cardSeleccionada()
+                combox(),
+                // cardSeleccionada(),
+                SizedBox(height: 50),
+                botonGuardar(
+                  context: context,
+                  activityModelPost: activityModelPost,
+                  dateTime: dateTime,
+                  dateTime2: dateTime2,
+                  selected: _selected,
+                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
 
-
-
+  void actualizarCards(){
+    setState(() {
+      // cardSeleccionada();
+    });
   }
 
   Widget buttonFecha(BuildContext context,DateTime _dateTime,String fecha){
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        primary: _colores.grey
+    return Container(
+      width: 160,
+      child: TextField(
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Fecha',
+          helperText: fecha == 'inicio' ? 'Seleccione Fecha Inicio' : 'Seleccione Fecha Final',
+          suffixIcon: GestureDetector(child: Icon(Icons.calendar_today), onTap:(){ pickDateTime(context,_dateTime, fecha);}),
+        ),
+        onTap: (){
+          // pickDateTime(context,_dateTime, fecha);
+        },
+        controller: TextEditingController(text: getText(fecha)),
       ),
-      onPressed: (){
-        if (fecha=='inicio') {
-          print('inicio');
-        }
-        pickDateTime(context,_dateTime, fecha);
-      },
-      child: Text(getText(fecha))
     );
   }
 
@@ -96,7 +131,7 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   Widget title(String mensaje){
   return Container(
     alignment: Alignment.bottomCenter, child:
-    Text(mensaje, style: TextStyle(color: _colores.black,fontWeight: FontWeight.bold,fontSize: 20)));
+    Text(mensaje, style: TextStyle(color: _colores.terciary,fontWeight: FontWeight.bold,fontSize: 20)));
   }
 
   Future pickDateTime(BuildContext context,_dateTime,fecha) async {
@@ -139,14 +174,14 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   String getText(String fecha){
     if (fecha=='inicio') {
       if (dateTime == null) {
-        return 'Select DateTime';
+        return '2022-01-01 00:00:00';
       }else{
         return DateFormat('yyyy-MM-ddTHH:mm:ss').format(dateTime);
       }
     }
     if (fecha=='final') {
       if (dateTime2 == null) {
-        return 'Select DateTime';
+        return '2022-01-01 00:00:00';
       }else{
         return DateFormat('yyyy-MM-ddTHH:mm:ss').format(dateTime2);
       }
@@ -181,34 +216,98 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
   return newTime;
   }
 
-  Widget buttonTareas(BuildContext context) {
+  // Widget buttonTareas(BuildContext context) {
+  //   return ElevatedButton(
+  //     onPressed: (){
+  //       // modalProvider.selectedModal = showMaterialDialog(context);
 
-    return ElevatedButton(
-      onPressed: (){
+  //       // alertDialog(context);
+  //       showMaterialDialog(context);
+  //     },
+  //     child: Text('Seleccionar tarea')
+  //   );
+  // }
 
-        // modalProvider.selectedModal = showMaterialDialog(context);
+  Widget combox(){
+    final taskProvider = Provider.of<TaskProvider>(context,listen: false);
 
-        // alertDialog(context);
-        showMaterialDialog(context);
+  List<dynamic> dataSource = [];
+
+
+    taskProvider.listTasks.forEach((item) {
+      dataSource.add({"id": item.id, "name": item.name});
+    });
+  print(_selected);
+  activityModelPost.taskId = _selected;
+
+
+// //     var item = taskProvider.listTaskModelGet ;
+    return  DropDownField(
+      value: _selected,
+      hintText: 'Seleccionar una Tarea',
+      dataSource: dataSource,
+      onChanged: (v) {
+        print(v);
+        setState(() {
+          _selected = v;
+        });
       },
-      child: Text('Seleccionar tarea')
+      valueField: 'id',
+      textField: 'name',
     );
   }
 
-  Widget cardSeleccionada() {
-    final taskProvider = Provider.of<TaskProvider>(context,listen: false);
-    // final blocActivitiesProvider = ProvidersActivities.of(context);
+  // Widget botonGuardar(){
 
-    return  Container(
-      width: 300,
-      height: 70,
-      child: Card(
-        child: Center(child:
-         Text(taskProvider.selectedTask.name,
-         style: TextStyle(fontWeight: FontWeight.bold)),
-      ),
-    ));
-  }
+  //   activityModelPost.dateEnd = dateTime2.toString();
+  //   activityModelPost.dateStart = dateTime.toString();
+  //   final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: false);
+
+  //   return Container(
+  //     width: 150,
+  //     child: ElevatedButton(
+  //       style: ElevatedButton.styleFrom(
+  //         primary: _colores.secondary
+  //       ),
+  //       onPressed: () async {
+  //         if (dateTime.isAfter(dateTime2)) {
+  //           mostrarSnacbar(
+  //             context: context,
+  //             typeConsult: 'errorDateTime',
+  //             typeModel: 'activities',
+  //           );
+  //         }else{
+  //           if (_selected == 'Seleccionar una Tarea') {
+  //             mostrarSnacbar(
+  //               context: context,
+  //               typeConsult: 'errorTask',
+  //               typeModel: 'activities',
+  //             );
+  //           }else{
+  //             var respuesta = await activitiesService.createActivity(activityModelPost);
+  //             snacbarProvider.selectedStatusCode = respuesta[0];
+  //             snacbarProvider.selectedMessage = respuesta[1];
+
+  //             if (respuesta[0]==200) {
+  //               Navigator.pop(context);
+  //             }
+
+  //             if (respuesta[0]==400) {
+  //               mostrarSnacbar(
+  //                 context: context,
+  //                 typeConsult: 'post',
+  //                 typeModel: 'activities',
+  //               );
+  //             }else{
+  //               Navigator.pop(context);
+  //             }
+  //           }
+  //         }
+  //       },
+  //         child: Text('Guardar'),
+  //       ),
+  //   );
+  // }
 
 
 }

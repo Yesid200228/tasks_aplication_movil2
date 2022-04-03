@@ -33,26 +33,26 @@ class ListTaskPageState extends State<ListTaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    actualizarListado();
+    actualizarListado('actualizar');
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: appBar(title: 'Lista de tareas'),
-      // body: Center(child: Text('Home Page'),),
-      // floatingActionButton: _crearBoton(context),
-      // floatingActionButton: ButtomNavigationBar(),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: _crearListado()
     );
   }
-  Future<void> actualizarListado () async {
-    final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: true);
-      setState(() {
-      if (snacbarProvider.selectedStatusCode == 0) {
+  Future<void> actualizarListado (String proces) async {
+    setState(() {
       _crearListado();
-      }
+
+    print('actualizarListado');
     });
+    // if (proces == 'cancelar') {
+    //   snacbarProvider.selectedStatusCode == 0;
+    // }else{
+    // }
   }
 
   Widget _crearListado(){
@@ -63,7 +63,7 @@ class ListTaskPageState extends State<ListTaskPage> {
           final tasks = snapshot.data;
           return ListView.builder(
             itemCount: tasks.length,
-            itemBuilder: (context,i) => _crearItem(tasks[i],context)
+            itemBuilder: (context,i) => _crearItem(tasks[i],context,i)
           );
 
         }else{
@@ -75,7 +75,7 @@ class ListTaskPageState extends State<ListTaskPage> {
 
 
 
-  Widget _crearItem( TaskModelGet task,BuildContext context){
+  Widget _crearItem( TaskModelGet task,BuildContext context,int index){
     final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: false);
 
     return Container(
@@ -85,16 +85,17 @@ class ListTaskPageState extends State<ListTaskPage> {
           color:  Colors.white,
         ),
         onDismissed: (direccion) async {
-         snacbarProvider.selectedStatusCode = await tasksService.deleteTask(task.id);
+          showDAlertDelete(context, task);
+        //  snacbarProvider.selectedStatusCode = await tasksService.deleteTask(task.id);
+        //  //boton de si o no
 
-        //  print(snacbarProvider.selectedStatusCode);
-         mostrarSnacbar(
-           status: snacbarProvider.selectedStatusCode,
-           context: context,
-            typeModel: 'task',
-            typeConsult: 'delete'
-         );
-        snacbarProvider.selectedStatusCode = 0;
+
+        //  mostrarSnacbar(
+        //    context: context,
+        //     typeModel: 'task',
+        //     typeConsult: 'delete'
+        //  );
+        // snacbarProvider.selectedStatusCode = 0;
         },
         child: Column(
           children: [
@@ -102,15 +103,13 @@ class ListTaskPageState extends State<ListTaskPage> {
               onTap: (){
                 Navigator.pushNamed(context, 'task',arguments: task).then((value) {setState(() {
                   mostrarSnacbar(
-                    status:  snacbarProvider.selectedStatusCode,
+                    // status:  snacbarProvider.selectedStatusCode,
                     context: context,
                     typeModel: 'task',
                     typeConsult: 'update'
                   );
-
-                });});
-                  actualizarListado();
               snacbarProvider.selectedStatusCode = 0;
+                });});
               },
               child: Container(
                 margin: EdgeInsets.all(15),
@@ -119,16 +118,42 @@ class ListTaskPageState extends State<ListTaskPage> {
                 child: Card(
                   elevation: 10,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // _crearDisponible(context,task),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container( padding: EdgeInsets.only(left: 10), child: Text('${task.name}',style: TextStyle(color: _colores.grey,fontWeight: FontWeight.bold))),
-                          Container(padding: EdgeInsets.only(left: 10), child: Text(task.description == null ? '' : task.description,style: TextStyle(color: _colores.grey,fontWeight: FontWeight.w300),)),
-                        ],
+                      Container(
+                        width: 10,
+                        height: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: _colores.getColor()[index % _colores.getColor().length],
+                        ),
+                      ),
+                      // tomar el lado derecho de la tarjeta
+                      SizedBox(width: 10,),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(left: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                task.name,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                task.description,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                      _statusTask(context,task),
                     ],
@@ -143,13 +168,69 @@ class ListTaskPageState extends State<ListTaskPage> {
   }
 
 
+  showDAlertDelete(BuildContext context, TaskModelGet taskModelGet) {
+
+
+    return showDialog(
+      context: context,
+      builder: (context){
+        return AlertDialog(
+          title: Text('Eliminar'),
+          content: Text('¿Esta seguro de eliminar la tarea?'),
+          actions: [
+            FlatButton(
+              child: Text('Cancelar'),
+              onPressed: (){
+                print('Cancelar');
+                Navigator.of(context).pop();
+                actualizarListado('cancelar');
+              },
+            ),
+            FlatButton(
+              child: Text('Aceptar'),
+              onPressed: () async {
+                // print('Aceptar');
+                final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: false);
+                var result = await tasksService.deleteTask(taskModelGet.id);
+                snacbarProvider.selectedStatusCode = result[0];
+                snacbarProvider.selectedMessage = result[1];
+
+                // print(result[0]);
+                // print(result[1]);
+
+                if (result[0] == 409) {
+                  Navigator.pop(context);
+                }
+                if (result[0] == 200) {
+                  Navigator.pop(context);
+                }
+
+              //  print(await tasksService.deleteTask(taskModelGet.id));
+               mostrarSnacbar(
+                 context: context,
+                  typeModel: 'task',
+                  typeConsult: 'delete'
+               );
+                actualizarListado('actualizar');
+                snacbarProvider.selectedStatusCode = 0;
+                // Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      }
+    );
+  }
+
+
   Widget _statusTask(BuildContext context,TaskModelGet taskModelGet) {
+
     // print(tipo.toString());
       return Container(
         padding: EdgeInsets.only(right: 20),
         child: Switch(
           value: taskModelGet.status,
-          activeColor: _colores.teal,
+          activeColor: _colores.secondary,
           onChanged:  (value)  async{
             await tasksService.editarEstadoTask(taskModelGet.id);
             setState(() {

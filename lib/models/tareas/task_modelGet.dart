@@ -10,10 +10,10 @@ String taskModelGetToJson(TaskModelGet data) => json.encode(data.toJson());
 
 class TaskModelGet {
     TaskModelGet({
-        this.id='',
-        this.name = '' ,
-        this.description= '',
-        this.status=true,
+      this.id='',
+      this.name = '' ,
+      this.description= '',
+      this.status=true,
     });
 
     String id;

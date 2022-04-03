@@ -4,22 +4,22 @@
 
 import 'dart:convert';
 
-ActivityModelGet activityModelGetFromJson(String str) => ActivityModelGet.fromJson(json.decode(str));
+ActivityModelPost activityModelPostFromJson(String str) => ActivityModelPost.fromJson(json.decode(str));
 
-String activityModelGetToJson(ActivityModelGet data) => json.encode(data.toJson());
+String activityModelPostToJson(ActivityModelPost data) => json.encode(data.toJson());
 
-class ActivityModelGet {
-    ActivityModelGet({
-      this.taskId,
-      this.dateEnd,
-      this.dateStart,
+class ActivityModelPost {
+    ActivityModelPost({
+      this.taskId='',
+      this.dateEnd='',
+      this.dateStart='',
     });
 
     String taskId;
     String dateEnd;
     String dateStart;
 
-    factory ActivityModelGet.fromJson(Map<String, dynamic> json) => ActivityModelGet(
+    factory ActivityModelPost.fromJson(Map<String, dynamic> json) => ActivityModelPost(
         taskId: json["taskId"],
         dateEnd: json["date_end"],
         dateStart: json["date_start"],

@@ -13,7 +13,7 @@ class ScanButton extends StatelessWidget {
     Colores _colores = Colores();
 
     return FloatingActionButton(
-      backgroundColor: _colores.space,
+      backgroundColor: _colores.primary,
       elevation: 0,
       onPressed: () {
         if (currentIndex==0) {
@@ -23,7 +23,7 @@ class ScanButton extends StatelessWidget {
           Navigator.pushNamed(context, 'task');
         }
       },
-      child: Icon(Icons.add,color: _colores.grey),
+      child: Icon(Icons.add,color: _colores.terciary),
     );
   }
 }

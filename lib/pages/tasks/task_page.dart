@@ -7,7 +7,6 @@ import 'package:task_aplicattion2/providers/snacbar_provider.dart';
 import '../../estilos/Colores_estilos.dart';
 import '../../models/tareas/task_modelGet.dart';
 import '../../models/tareas/task_modelPost.dart';
-import '../../providers/ui_provider.dart';
 import '../../services/tasks_service.dart';
 import '../../widgets/snacbar_widget.dart';
 import '../../widgets/textFormField_task_widget.dart';
@@ -29,9 +28,6 @@ class _TaskPageState extends State<TaskPage> {
   final scaffoldkey = GlobalKey<ScaffoldState>();
   final tasksService = TasksService();
 
-
-  
-
   TaskModelPost taskModelPost = TaskModelPost();
   TaskModelGet taskModelGet = TaskModelGet();
 
@@ -43,7 +39,6 @@ class _TaskPageState extends State<TaskPage> {
 
     Colores _colores = Colores();
 
-    
     // bool tipo = ModalRoute.of(context).settings.arguments;
     taskModelGet = taskDataGet;
 
@@ -51,10 +46,11 @@ class _TaskPageState extends State<TaskPage> {
     return Scaffold(
       key: scaffoldkey,
       appBar: AppBar(
-        backgroundColor: _colores.teal,
+        backgroundColor: _colores.secondary,
         title: Text(
-          'Crear tareas',
-          style: TextStyle(color: _colores.space),
+          taskModelGet != null ?
+          'Actualizar tareas' : 'Crear tareas',
+          style: TextStyle(color: _colores.primary),
         ),
         actions: [],
         centerTitle: true,
@@ -69,7 +65,7 @@ class _TaskPageState extends State<TaskPage> {
                 // _crearName(_colores),
                 formField(
                   type: 'name',
-                  icon: Icon(Icons.task_outlined,color: _colores.grey),
+                  icon: Icon(Icons.task_outlined,color: _colores.terciary),
                   hintext: 'Ir a la universidad',
                   labelText: 'Nombre de la tarea',
                   taskModelGet: taskModelGet,
@@ -172,16 +168,16 @@ class _TaskPageState extends State<TaskPage> {
       height: 40,
       child: ElevatedButton(
         style:
-            ElevatedButton.styleFrom(primary: colores.teal),
+            ElevatedButton.styleFrom(primary: colores.secondary),
         child: Row(
           children: [
-            Icon(Icons.save, color: colores.space),
+            Icon(Icons.save, color: colores.primary),
             SizedBox(
               width: 10,
             ),
             Text(
               'Guardar',
-              style: TextStyle(color: colores.space),
+              style: TextStyle(color: colores.primary),
             )
           ],
         ),
@@ -209,7 +205,6 @@ class _TaskPageState extends State<TaskPage> {
   Future<void> _submit(BuildContext context) async {
     final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: false);
 
-
     if (!formKey.currentState.validate()) return;
     formKey.currentState.save();
 
@@ -221,13 +216,27 @@ class _TaskPageState extends State<TaskPage> {
       // print(taskModelGetToJson(taskModelGet));
       snacbarProvider.selectedStatusCode = await tasksService.editartask(taskModelGet);
 
+      Navigator.pop(context);
+
     } else {
       //Registrar
-      snacbarProvider.selectedStatusCode = await tasksService.crearTask(taskModelPost);
+      var respuesta = await tasksService.crearTask(taskModelPost);
+
+      snacbarProvider.selectedStatusCode = respuesta[0];
+      snacbarProvider.selectedMessage = respuesta[1];
+      if (respuesta[0]==400) {
+        mostrarSnacbar(
+          context: context,
+          typeConsult: 'post',
+          typeModel: 'task',
+        );
+      }else{
+        Navigator.pop(context);
+      }
     }
 
 
-    Navigator.pop(context);
+    // Navigator.pop(context);
   }
 
 }

@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
                 ]),
             child: Column(
               children: [
-                Text('Ingreso', style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold,color: _colores.grey)),
+                Text('Ingreso', style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.bold,color: _colores.terciary)),
                 SizedBox(height: 60.0),
                 _crearEmail(bloc),
                 SizedBox(height: 30.0),
@@ -83,13 +83,13 @@ class _LoginPageState extends State<LoginPage> {
               keyboardType: TextInputType.emailAddress,
               decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: _colores.teal),
+                  borderSide: BorderSide(color: _colores.secondary),
                 ),
-                  icon: Icon(Icons.alternate_email, color: _colores.black),
+                  icon: Icon(Icons.alternate_email, color: _colores.cuaternary),
                   hintText: 'ejemplo@correo.com',
                   labelText: 'Correo electronico',
                   labelStyle: TextStyle(
-                    color: _colores.black
+                    color: _colores.cuaternary
                   ),
                   counterText: snapshot.data,
                   errorText: snapshot.error
@@ -120,12 +120,12 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: _colores.teal),
+                  borderSide: BorderSide(color: _colores.secondary),
                 ),
-                icon: Icon(Icons.lock_outline, color: _colores.black),
+                icon: Icon(Icons.lock_outline, color: _colores.cuaternary),
                 labelText: 'Contraseña',
                 labelStyle: TextStyle(
-                  color: _colores.black
+                  color: _colores.cuaternary
                 ),
                 errorText: snapshot.error
             ),
@@ -150,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
           elevation: 0.0,
-          color: _colores.teal,
+          color: _colores.secondary,
           textColor: Colors.white,
           onPressed: snapshot.hasData ? ()=> _login(context) : null ,
         );
@@ -169,9 +169,9 @@ class _LoginPageState extends State<LoginPage> {
       width: double.infinity,
       decoration: BoxDecoration(
           gradient: LinearGradient(colors: <Color>[
-            _colores.teal,
-            _colores.grey,
-            // _colores.black,
+            _colores.secondary,
+            _colores.terciary,
+            // _colores.cuaternary,
 
         // Color.fromRGBO(63, 63, 156, 1.0),
         // Color.fromRGBO(90, 70, 178, 1.0),

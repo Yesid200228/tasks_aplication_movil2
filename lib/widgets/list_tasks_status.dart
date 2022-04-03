@@ -8,7 +8,7 @@ import '../services/tasks_service.dart';
 
 
 
-  final tasksProvider = new TasksService();
+  final tasksService = new TasksService();
   Colores _colores = Colores();
 
 
@@ -33,7 +33,7 @@ Widget showMaterialDialog(BuildContext context) {
 
     Widget _crearListado(){
     return FutureBuilder(
-      future: tasksProvider.cargarTasksTrue(),
+      future: tasksService.cargarTasksTrue(),
       builder: (BuildContext context, AsyncSnapshot<List<TaskModelGet>> snapshot){
         if (snapshot.hasData) {
           final tasks = snapshot.data;
@@ -56,6 +56,8 @@ Widget showMaterialDialog(BuildContext context) {
     Widget _crearItem( TaskModelGet task,BuildContext context){
 
     final taskProvider = Provider.of<TaskProvider>(context,listen: false);
+  //  ActivitiesPage ac = ActivitiesPage(a: 'APPPP',);
+
 
     return ListTile(
       title: Column(
@@ -66,10 +68,11 @@ Widget showMaterialDialog(BuildContext context) {
             child: GestureDetector(
               onTap: (){
                 taskProvider.selectedTask = task;
+                // ActivitiesPage(a: 'Ojin',);
                 Navigator.pop(context);
               },
               child: Card(
-                color: _colores.space,
+                color: _colores.primary,
                   child: Center(child: Text(task.name,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),)),
               ),
             ),

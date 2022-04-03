@@ -1,32 +1,48 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:hotreloader/hotreloader.dart';
 import 'package:provider/provider.dart';
 import 'package:task_aplicattion2/providers/task_provider.dart';
+import 'package:task_aplicattion2/services/url.dart';
 
 import '../models/tareas/task_modelGet.dart';
 import '../models/tareas/task_modelPost.dart';
-import '../providers/snacbar_provider.dart';
 
 class TasksService {
-  final String _url = 'http://192.168.1.97:3000';
+  String _url = UrlService().url;
   Dio dio = Dio();
-
 
   TaskModelPost task = new TaskModelPost();
 
-  Future<int> crearTask(TaskModelPost task) async {
-
+  Future<List> crearTask(TaskModelPost task) async {
 
     final url = '$_url/tasks';
 
-    final resp = await dio.post(url, data: taskModelToJson(task));
-
-    print(resp.data);
+    // print(resp.data);
     // print(resp.statusCode);
+      try {
+      Response resp = await dio.post(url, data: taskModelToJson(task));
+      resp;
+
+      return [resp.statusCode,'Tarea Registrada'];
+
+      } on DioError catch (e) {
+
+        e.message;
+        if (e.type == DioErrorType.connectTimeout) {
+          throw Exception('');
+        }
+        var statusCode = e.response.data['statusCode'];
+        var message = e.response.data['message'][0].toString();
+
+        print(message);
+        print(statusCode);
+
+        // print(e.response.data['message'][0].toString());
+        return [statusCode,message];
+
+      }
 
 
-    return resp.statusCode;
   }
 
 
@@ -56,7 +72,7 @@ class TasksService {
   }
 
   Future<List<TaskModelGet>> cargarTasksTrue() async {
-    final url = '$_url/tasks';
+    final url = '$_url/tasks/?filters=status||\$eq||1';
     // Map<String, dynamic> query;
 
     final resp = await dio.get(url);
@@ -85,17 +101,30 @@ class TasksService {
     final url = '$_url/tasks/$id/status';
     await dio.put(url);
 
-    return 'AQUIII';
+    return '';
   }
 
-  Future<int> deleteTask(String id) async {
-
+  Future<List> deleteTask(String id) async {
 
     final url = '$_url/tasks/$id';
 
-   final resp = await dio.delete(url);
+    try {
+    final resp = await dio.delete(url);
+    return [resp.statusCode,'Tarea Eliminada'];
 
+    } on DioError catch (e) {
 
-    return resp.statusCode;
+      e.message;
+      if (e.type == DioErrorType.connectTimeout) {
+        throw Exception('');
+      }
+      var statusCode = e.response.data['statusCode'];
+      var message = e.response.data['message'].toString();
+
+      // print(e.response.data['message'][0].toString());
+      return [statusCode,message];
+      
+    } catch (e) {
+    }
   }
 }

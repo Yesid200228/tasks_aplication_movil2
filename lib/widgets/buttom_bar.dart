@@ -1,11 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'package:hotreloader/hotreloader.dart';
 import 'package:pandabar/main.view.dart';
 import 'package:pandabar/model.dart';
 import 'package:provider/provider.dart';
-import 'package:task_aplicattion2/pages/tasks/list_tasks_page.dart';
-import 'package:task_aplicattion2/widgets/snacbar_widget.dart';
+ import 'package:task_aplicattion2/widgets/snacbar_widget.dart';
 
 import '../estilos/Colores_estilos.dart';
 import '../providers/snacbar_provider.dart';
@@ -29,7 +27,7 @@ class _ButtomNavigationBarState extends State<ButtomNavigationBar> {
 
     final uiProvider = Provider.of<UiProvider>(context);
     // final currentIndex = uiProvider.selectedMenuOpt;
-    final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: false);
+    final snacbarProvider = Provider.of<SnacBarProvider>(context,listen: true);
 
 
     return PandaBar(
@@ -64,25 +62,24 @@ class _ButtomNavigationBarState extends State<ButtomNavigationBar> {
         },
         fabIcon: Icon(Icons.add),
         fabColors: [
-          _colores.teal,
-          _colores.grey,
+          _colores.secondary,
+          _colores.terciary,
         ],
-        buttonSelectedColor: _colores.teal,
-        backgroundColor: _colores.black,
+        buttonSelectedColor: _colores.secondary,
+        backgroundColor: _colores.terciary,
         onFabButtonPressed: () {
           if (uiProvider.selectedMenuOpt ==1) {
             Navigator.pushNamed(context, 'task').then((value) async {
 
               setState(() {
                 mostrarSnacbar(
-                  status:  snacbarProvider.selectedStatusCode,
+                  // status:  snacbarProvider.selectedStatusCode,
                   context: context,
                   typeModel: 'task',
                   typeConsult: 'post'
                 );
               });
               snacbarProvider.selectedStatusCode = 0;
-
 
             });
           }
